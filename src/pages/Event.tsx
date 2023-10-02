@@ -1,10 +1,12 @@
+import { Layout } from "antd";
 import React, { FC } from "react";
+import EventCalendar from "../components/EventCalendar";
 
 const Event: FC = () => {
    return (
-      <div>
-         Event PAGE
-      </div>
+     <Layout>
+         <EventCalendar events={[]} />
+     </Layout>
    )
 }
 

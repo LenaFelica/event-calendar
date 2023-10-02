@@ -1477,3 +1477,81 @@ type={"password"} //* чтобы скрыь символы
 // }
 
 // export default App;
+
+
+//! Календарь!!!
+//* у нас еть компонент Event, сюда надо добавить календарь
+//* идем в ant design -> components -> calendar
+//* https://ant.design/components/calendar#header
+
+//* под календарь создадим отдельный компонет EventCalendar.tsx
+//* развернем его!
+//* и возвращать мы будем компонет, который предоставляет нам ant design
+//
+// import { Calendar } from 'antd';
+// import React, { FC } from 'react';
+// import { IEvent } from '../models/IEvent';
+
+// interface EventCalendarProps {
+//    events: IEvent[];
+// }
+
+// const EventCalendar: FC<EventCalendarProps> = () => {
+//   return (
+//     <Calendar />
+//   )
+// }
+
+// export default EventCalendar;
+
+//
+//
+//* теперь создадим еще один тип, один интерфейс в models
+//* который будет соответствовать самому событию
+//* в папке models создаем файл IEvent.ts
+//* экспортируем интерфейс и там будут поля:
+//* юзернэйм автора
+//* юзернэйм гостя
+//* дата - можно было указать Date(), но мы осознанно укажем стринговый ип, чтобы приводить к нужному формату и отправлять на бэкэнд
+//* у каждого события будет описание - description
+//
+//* author: string;
+//* guest: string; 
+//* date: string;
+//* dscription: string;
+
+// export interface IEvent {
+//    author: string;
+//    guest: string;
+//    date: string;
+//    description: string; 
+// }
+
+//* указываем, что компонент EventCalenar FC
+//* и в нем же создадим интерфейс. в котором опишем, какие пропсы этот компонент будет ожидать!!
+//* будет один пропс - это как раз массив этих событий, для которых мы сделали  интерфейс.
+//* interface EventCalendarProps {
+//*    events: IEvents[];
+//* }
+
+//* и как джененрик указываем этот интерфейс с пропсами
+//* const EventCalendar: FC<EventCalendarProps> = () => {
+//*   
+//* }
+
+//* вернемся к компоненту Event
+//* добавим в Layout компонент, коорый мы создали!!!
+
+// import { Layout } from "antd";
+// import React, { FC } from "react";
+// import EventCalendar from "../components/EventCalendar";
+
+// const Event: FC = () => {
+//    return (
+//      <Layout>
+//          <EventCalendar events={[]} />
+//      </Layout>
+//    )
+// }
+
+// export default Event;
