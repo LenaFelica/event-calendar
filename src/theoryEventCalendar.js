@@ -1541,10 +1541,13 @@ type={"password"} //* чтобы скрыь символы
 
 //* вернемся к компоненту Event
 //* добавим в Layout компонент, коорый мы создали!!!
+//* пропс со списом событий обязательный
+//* пока пеедадим туда пустой массив  events={[]}
 
 // import { Layout } from "antd";
 // import React, { FC } from "react";
 // import EventCalendar from "../components/EventCalendar";
+
 
 // const Event: FC = () => {
 //    return (
@@ -1555,3 +1558,582 @@ type={"password"} //* чтобы скрыь символы
 // }
 
 // export default Event;
+
+//*--------------------------------------
+//! ДОавляем события на конкретную дату
+
+//* ПОд календарем в макете была кнопка  - добавить событие!!
+//* значит в Event.tsx -> Layout -> под EventCalendar
+//* создаем копонент флекс строку 
+//* - <Row justify="center"></Row> - чтобы кнопка была оередине
+//* и внутрь этой конструкции помещаем <Button>Добавить событие</Button>
+
+//* Появилась кнока под календарем!!
+//* Теперь при нажатии на эту кнопку надо вызывать модальное окно!!
+
+//! Модальное окно
+//* идем в Event.jsx
+//*  под компонент Row добавляем компонент Modal 
+//* - имортируем его из ant design
+//* сразу доавим него неоходимые пропсы
+//* title - Заголовок модальногоокна - Добавить событие
+//* visible - будем контролировать видимость - за это отвечает пропс visible
+
+//* выше созаем состояние и инициализируем его и по умолчанию false
+//* const [modalVisible, setModalVisible] = useState(false)
+//* и это сосояние мы передаем как проп в модальное окно 
+//* visible={modalVisible}
+
+//* а на Button вешаем слушатель события onClick 
+//* - при нажатии на нее изменять состояние на true
+//* onClick={() => setModalVisible(true)}
+
+//* Сечас при нажатии на кнопку всплывает окно, но нет полей!!!
+//* и окно не закрываетя!
+
+//* и чтобы убрать кнопки внизу окна - cancel и ok
+//* footer={null}
+//* у нас будут свои кнопки
+//
+//* Также надо обработать закрытие этого модального окна
+//* onCancel={() => setModalVisible(false)}
+//* если сейчас ткнуть на темную область или на крестик, то модалка закроетсяя
+
+// import { Button, Layout, Modal, Row } from "antd";
+// import React, { FC, useState } from "react";
+// import EventCalendar from "../components/EventCalendar";
+
+// const Event: FC = () => {
+
+//    const [modalVisible, setModalVisible] = useState(false)
+//    return (
+//      <Layout>
+//          <EventCalendar events={[]} />
+//          <Row justify="center">
+//             <Button onClick={() => setModalVisible(true)}>Добавить событие</Button>
+//          </Row>
+//          <Modal 
+//                title="Добавить событие" 
+//                visible={modalVisible}
+//                footer={null}
+//                onCancel={() => setModalVisible(false)}               
+//                >
+
+//          </Modal>
+//      </Layout>
+//    )
+// }
+
+// export default Event;
+
+//! EventForm  *** Форма для создания события!!
+//* под нее создаем отдельный копонент - EventForm.tsx
+//* разворачиваем и заполняем
+//* FC
+//* в корне будет компонент Form из ant design
+//* в LoginForm  мы уже работали с элментами этой формы - идем туда
+//* и копируем и вставляем в EventForm.tsx
+
+// const EventForm: FC = () => {
+//    return (
+//      <Form>
+//        <Form.Item
+//           label="Описание события"
+//           name="description"
+//* можно здесь написать внутри "Обязательное поле" - но можно пойти в rules.ts и там задать как дефолтное значение функции required
+//* и здесь передавать параметр не придется
+//           rules={[rules.required()]}
+//        >
+//           <Input
+//             value={}
+//             onChange={}
+//           />
+//        </Form.Item>
+//      </Form>
+
+//* Но можно пойти в rules.ts и там задать это значение
+//* как дефолтное для самомй функции required!!!
+// export const rules = {
+//    required: (message: string = "Обязательное поле!") => ({
+//       required: true,
+//       message
+//    })
+// }
+
+//! EvrentForm
+
+// import { Form, Input } from 'antd';
+// import React, { FC } from 'react';
+// import { rules } from '../utils/rules';
+
+// const EventForm: FC = () => {
+//   return (
+//     <Form>
+//       <Form.Item
+//          label="Описание события"
+//          name="description"
+//          rules={[rules.required()]}
+//       >
+//          <Input
+//          />
+//       </Form.Item>
+//     </Form>
+//   )
+// }
+
+// export default EventForm;
+
+//* На данном этапе в форме всего 1 инпут, но добавить ее в модалку уже можем
+
+//! Event.tsx
+// import { Button, Layout, Modal, Row } from "antd";
+// import React, { FC, useState } from "react";
+// import EventCalendar from "../components/EventCalendar";
+// import EventForm from "../components/EventForm";
+
+// const Event: FC = () => {
+
+//    const [modalVisible, setModalVisible] = useState(false)
+//    return (
+//      <Layout>
+//          <EventCalendar events={[]} />
+//          <Row justify="center">
+//             <Button onClick={() => setModalVisible(true)}>Добавить событие</Button>
+//          </Row>
+//          <Modal 
+//                title="Добавить событие" 
+//                visible={modalVisible}
+//                footer={null}
+//                onCancel={() => setModalVisible(false)}               
+//                >
+//                <EventForm />
+//          </Modal>
+//      </Layout>
+//    )
+// }
+
+// export default Event;
+
+//* возвращаемсяк форме
+//* здесь еще будет пару элементов
+//
+//* нам необходимо выбирать дау
+//* в ant design DatePicker
+//* в EventForm
+//* в <Form></Form> созать еще один 
+//* <Form.Item> и в него помещаем DatePicker
+//* <DataPicker />
+//* </Form.Item>
+//* Для Form.Item указываем пропсы!! - labe, name, rules
+//* а таже под формой айтем с datePicker вставляем форм айте с кнопкой
+
+//* Чтоы кнопка была выровнена по правому краю, 
+//* всю эту форм айтем с кнопкой помещаем в компоннт <Row justify="end"></Row>
+//* 
+//! Event Form
+// import { Button, DatePicker, Form, Input, Row } from 'antd';
+// import React, { FC } from 'react';
+// import { rules } from '../utils/rules';
+
+// const EventForm: FC = () => {
+//   return (
+//     <Form>
+//       <Form.Item
+//          label="Описание события"
+//          name="description"
+//          rules={[rules.required()]} //* это красный маркер(цветочек) перед названием и двоетоие после!!
+//       >
+//          <Input
+//          />
+//       </Form.Item>
+
+//       <Form.Item
+//          label="Дата события"
+//          name="date"
+//          rules={[rules.required()]} //* это красный маркер(цветочек) перед названием и двоеточие после!!
+//       >
+//          <DatePicker />
+//       </Form.Item>
+      
+//       <Row justify="end">
+//       <Form.Item>
+//          <Button type="primary" htmlType="submit">
+//              Создать
+//          </Button>
+//       </Form.Item>
+//       </Row>
+
+//     </Form>
+//   )
+// }
+
+// export default EventForm;
+
+//* --------------------------------------
+
+//* Сйчас есть поле формы  - описание события, дата
+//* помио эого должен быть выпадающий список
+//* внутри которого должен быть список имен пользователей!!
+//*которых мы будем выбирать и прикрплять к этому событию
+
+//* в js выпадающи списо формируется  помощью тега <select name="" id=""><option value=""></option></select>
+//* а ниже input с type="button" 
+{/* <form name="">
+   <select name="" id="">
+      <option value=""></option>
+      <option value=""></option>
+      <option value=""></option>
+   </select>
+   <input type="button" onClick="...">
+</form> */}
+
+//**************************** */
+//* ноо мы пойдем в энт дизайн и там возьмем выпадающий список!!
+//* ant design -> select
+//* развернем код образца, скопируем первый слект и вставиим в форму под datePicker
+//*- этот селект такой же элемент формы, поэтому ео также необходимо обернуть в form.Item
+
+//* сейчас это выглядит так!!::
+// <Form.Item>
+//  <Select
+// defaultValue="lucy"
+// style={{ width: 120 }}
+// onChange={handleChange}
+// options={[
+//   { value: 'jack', label: 'Jack' },
+//   { value: 'lucy', label: 'Lucy' },
+//   { value: 'Yiminghe', label: 'yiminghe' },
+//   { value: 'disabled', label: 'Disabled', disabled: true },
+// ]}
+// >
+// </Form.Item>
+
+//* Так это выглядит у ульби ранняя версия:
+//* в код доавлю ее
+{/* <Form.Item>
+<Select>
+   <Option value="jack">jack</Option>
+   <Option value="jack">jack</Option>
+   <Option value="jack">jack</Option>
+   <Option value="disabled" disabled>Disabled</Option>
+   <Option value="yiminghe">yiminghe</Option>
+</Select>
+</Form.Item> */}
+//* 
+//* Но нам надо получать пользователей, которые у нас в users.json
+//* Самих пользователей будем сохранять в глобальное состояние
+//* 
+//* Создадим еще один папку редьюсер и назовем его event
+
+//! store->reduces->event->index.ts
+
+//* создаем дфолтное состояние этого редьюсера - const initialState ={}
+//* и сразу эксортируем по дефолту функцию - это будет сам рельюсер
+//* редьюсер первым аргументом принимает само стотояние. а вторым action
+//* export default function EventReducer(state = initialState, action ) {}
+//* 
+//* создадим внутри конструкциб switch/ase в зависимотси от типа экшена
+//* и сразу обработаем дефолтный случай, в котором мы просто возвращаем состояие
+
+//* тутже в папке evnt создаем теперь types/ts
+//* там интерфейс EventState {
+//*    guests: IUser[] - массив гостей, которых приглашают на событие
+//*    events: IEvents[] - сам массив ивентов(событий), которые будут создавать пользователи
+//* }
+//
+//* также здесь по хорошему обработать индикацию загрузки
+//* но так как мы не работаем с реальным сервером, то этот момент упустим но вобще надо!!
+
+//* Далее, так же как в auth редьюсере в types/ts создаем перечиссление enum EventActionEnum - там мы храним типы экшенов!!!
+//* зесь будет 2 типа:
+//* SET_GUESTS - добавить пользователя
+//* SET_EVENTS - добавить событие
+
+//* и далее для каждого экшена создадим по интерфейсу
+
+//! event -> types.ts:
+
+// import { IEvent } from './../../../models/IEvent';
+// import { IUser } from './../../../models/IUser';
+
+
+// export interface EventState {
+//    guests: IUser[];
+//    events: IEvent[];
+// }
+
+// export enum EventActionEnum {
+//    SET_GUESTS = "SET_GUESTS",
+//    SET_EVENTS = "SET_EVENTS"
+// }
+
+// export interface SetGuestsAction {
+//    type: EventActionEnum.SET_GUESTS,
+//    payload: IUser[],
+// }
+
+// export interface SetEventsAction {
+//    type: EventActionEnum.SET_EVENTS,
+//    payload: IEvent[],
+// }
+
+// export type EventsAction = SetGuestsAction | SetEventsAction
+
+
+//! event -> index.ts
+// import { IEvent } from './../../../models/IEvent';
+// import { EventActionEnum, EventsAction, EventState } from "./types";
+
+// const initialState: EventState = {
+//    guests: [],
+//    events: [],
+// }
+
+// export default function EventReducer(state = initialState, action: EventsAction): EventState  {
+//    switch(action.type) {
+//       case EventActionEnum.SET_GUESTS:
+//          return { ...state, guests: action.payload}
+//       case EventActionEnum.SET_EVENTS:
+//          return { ...state, events: action.payload}
+
+//       default:
+//          return state;
+//    }
+// }
+//* export default function EventReducer(state = initialState, action: EventsAction): ! EventState  {
+//* EventState - здесь в качестве возвращаемого значения!! так как редьюсер ВСЕГДА возвращат состояние
+
+
+//! Action Creators для event (sstore->reducers ->event)
+//* дялее создаем для этого редьюсера (event) action creators
+//* все так же как и для редьюсера auth в store
+//* event -> action-creators.ts
+
+//* Синхронные:
+// import { IEvent } from './../../../models/IEvent';
+// import { IUser } from './../../../models/IUser';
+// import { EventActionEnum, SetGuestsAction, SetEventsAction } from './types';
+
+//* оздаем 2 функции
+//* одна будет возвращать экшнкреатор, чтобы поместить в состояние гостей
+//* ворая - для ивента
+// *схема:
+//* setGuests: (): SetGuestsAction => ({})
+
+// export const EventActionCreators = {
+//    setGuests: (payload: IUser[]): SetGuestsAction => ({type: EventActionEnum.SET_GUESTS, payload}),
+//    setEvents: (payload: IEvent[]): SetEventsAction => ({type: EventActionEnum.SET_EVENTS, payload})
+
+//* сразу сделаем асинхронный экшн
+//* с помощью него мы будем получать пользователей из файла users.json
+//* асинхронный экшн должен возвращать еще одну функцию, уоторая аргументом принимает dispatch
+
+//* обращаемся к нашему файлу, который заменяет сервер - users.json
+//*    fetchGuests: () => async (dispatch: AppDispatch) => {
+   // try {
+   //    const response = await axios.get('./users.json')
+   // } catch(e) {
+   //    console.log(e);
+   // }
+// }
+
+//! ***   клиент-сервеное взаимодействие  ****
+
+//* и получается , что запрос в users.json, а там ожет быть и запрос к серверу
+//* у нас дубируетс дважды - необходимо дважды прописывать url
+//* какие-то query парамтры, тело запроса, возможно. какие-то хэдэры
+//* и в экшн креатор длz auth и здесь в event
+//* происходит дублирование логии, дублирования кода!
+//* и хорошим архитктурным патерном явлется выделение еще оного слоя
+//* коорый отвечает как раз за клиент-сервеное взаимодействие
+//* слой, который получает данные и отдает их!
+//* нам необходимо:
+// src -> api -> UserService.ts
+//* здесь мы создаем и экспортируем класс UserService {}
+//* внутри этого класса будет один еддинтвенный метод getUsers()
+//* это будет асинхронная функци, внутри которой мы будем делать запрос на получение данных из файла
+//* посколько функция асинхронная, оа всегда будет возвращать какой-то промис
+//* в проми завернуты данные - в нашем случае это AxiosResponse
+//* то есть. то что олучит аксиос, то что вернет нам аксиос
+//* а в поле data будет находиться массив пользователей
+//* async getUsers(): Promise<AxiosResponse<IUser>>
+//* 
+//! static
+//* укажем, что это функция статичная - static
+//* Что мы можем вызывать ее без создания экземпляра класса!!!!!
+
+// import axios, { AxiosResponse } from "axios";
+// import { IUser } from "../models/IUser";
+
+// export default class UserService {
+//    static async getUsers(): Promise<AxiosResponse<IUser[]>> {
+//         return axios.get<IUser[]>('./users.json')
+//    }
+// }
+
+//* теперь возвращаемся в редьюсеры, где мы делали запрос к данным.\
+//* и там вызовем метод getUsers() из UserService
+// setTimeout( async () => {
+//    const response = await UserService.getUsers();
+//    const mockUsers = response.data.find(user => user.username === username && user.password === password);
+//* и 
+// fetchGuests: () => async (dispatch: AppDispatch) => {
+//    try {
+//       const response = await UserService.getUsers()\
+//* далее задиспатчить то, что поучили в экшн Креаторс
+//* и передать то, что получили в response
+//* dispatch(EventActionCreators,setGuests(response.data))
+
+//* при этом в корневой редьюсер надо добавить event!!!:
+//* импортируем его в файл, который обобщает все редьюсеры 
+//* и добавим его в объект, коорый мы отсюда экспортируем
+//
+// import auth from './auth';
+// import event from './event';
+
+// export default {
+//    auth,
+//    event,
+// }
+
+//* теперь в компоненте Event.tsx надо вызвать этот EventActionCreators
+//*
+//* pages -> Event.tsx
+//* там для этого воспользуемся useEffect
+//* чтобы при первой загрузке сразу подгрузился список пользователя!!!
+//* диспатчить его нужды нет, потому что мы используем хук useActions()
+
+// useEffect(() => {
+//     fetchGuests()
+// }, [])
+
+//* и у нас же есть Хук useActions() , с помощью которого
+//*  мы можем нужный для нас EventactionCreators получить
+//* const {fetchGuests} = useActios()
+
+//* но прежде его нужно развернуть в обобщающий объект!!
+//* reducers -> action-creators.ts :
+// import { AuthActionCreators } from "./auth/action-creators";
+// import { EventActionCreators } from "./event/action-creators";
+
+
+// export const allActionCreators = {
+//     ...AuthActionCreators,
+//!     ...EventActionCreators,
+// }
+
+//! Event.tsx
+
+// import { Button, Layout, Modal, Row } from "antd";
+// import React, { FC, useEffect, useState } from "react";
+// import EventCalendar from "../components/EventCalendar";
+// import EventForm from "../components/EventForm";
+// import { useActions } from "../hooks/useActions";
+
+// const Event: FC = () => {
+
+//    const [modalVisible, setModalVisible] = useState(false)
+
+//!    const {fetchGuests} = useActions();
+
+//!    useEffect(() => {
+//!       fetchGuests(); //* соответствующий экшн креатор вызываем внутри юзэффект
+//!    }, [])
+
+
+//    return (
+//      <Layout>
+//          <EventCalendar events={[]} />
+//          <Row justify="center">
+//             <Button onClick={() => setModalVisible(true)}>Добавить событие</Button>
+//          </Row>
+//          <Modal 
+//                title="Добавить событие" 
+//                visible={modalVisible}
+//                footer={null}
+//                onCancel={() => setModalVisible(false)}               
+//                >
+//                <EventForm />
+//          </Modal>
+//      </Layout>
+//    )
+// }
+
+// export default Event;
+
+//!*********************************************
+
+//!  **  Выпадающий список поместить сисок поьзователей  ***
+//* внутырь select (выпадающего списка) поместить список пользоватлей
+
+//* идем в EventForm.tsx 
+//* для этого надо определить, какие пропсы принимает данный компонент
+
+//* Под импортами создаем интерфейс EventFormProps {}
+//* как раз этот компонент будет принимать список гостей
+
+//!------------------------------------------------------------
+//* ТО ЕСТЬ, в данном случае мы не получаем этот список из состояния
+//* А Принимаем пропсом!, чтоы эту форму можно было переиспользовать!!!!
+//* И возможно в какомто другом месте приложени будет другой список пользователей!!!!
+//!-------------------------------------------------------------
+//
+//
+//! interface EventFormProps {
+//!    guests: IUser[]
+//! }
+
+//! const EventForm: FC<EventFormProps> = (props) => {
+//    return (
+//      <Form>
+//        <Form.Item
+//           label="Описание события"
+//           name="description"
+//           rules={[rules.required()]}
+//        >
+//           <Input
+//           />
+//        </Form.Item>
+
+//!! теерь ниже здесь же в EventForm.tsx
+//* мы все опции из select удалем!!!
+//* и итерируемся с помощью МАР по списку гостей
+//* для каждого гостя отрисовываем свою опцию
+//* в качестве value={guest.username}
+//* и как текст укажем юзернэйм
+//* подразумевается, что юзернэйм уникальный, поэтому можно его использовать в качестве value
+//
+//? {props.guests.map(guest => 
+//?     <Select.Option value={guest.username} key={guest.username}>
+//?           {guest.username}
+//?     </Select.Option>
+//? )}
+
+//! теперь идем в компонент Events.tsx
+//* и там в EventForm надо передать соответствующий пропс
+//? <EventForm 
+//?    guests={guests}
+//? />
+
+//* а получим мы этот список его здесь в Events
+//*  помощью ХУКА useTypeSelector из нашего сотояния!!!
+//* сразу делаем деструкторизацию
+//* обращаемся к редьюсеру event и получаем оттуда поле guests
+//? const {guests} = useTypedSelector(state => state.event)
+
+//! Делаем форму управляемой
+//* Сразу сделаем форму управляемой!!
+//* релизуем onChnge и передадим value в соответствующие элементы формы
+//* создадим состояние, гед будем хранить информацию о событии, которое мы будем создавать
+//* сразу типизируем event - useState<IEvent> и проинициализируем!!!
+//* в объекте по хорошему объявить, какие у нас будут поля!!
+//* и чему по умолчанию они будут ровняться
+//* чтобы в дальнейшем связывать  инпутами, с элементами , с селектами, с датепикерами
+//* проинициализируем пустой строкой
+// const [event, setEvent] = useState<IEvent>({
+//    author: '',
+//    date: '',
+//    description: '',
+//    guest: '',
+// } as IEvent); 
+//* <Select onChange={}

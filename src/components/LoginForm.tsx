@@ -59,4 +59,4 @@ const LoginForm: FC = () => {
   )
 }
 
-export default LoginForm
+export default LoginForm;

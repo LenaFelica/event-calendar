@@ -32,7 +32,7 @@ const { logout } = useActions();
               <Menu.Item 
                      onClick={logout} 
                      key={1}>
-                     Выйти
+                     Exit
               </Menu.Item>
               </Menu>     
               </>
@@ -41,7 +41,7 @@ const { logout } = useActions();
                   <Menu.Item 
                      onClick={() => console.log('Login')} 
                      key={1}>
-                     Логин
+                     Login
                   </Menu.Item>
               </Menu>
           }
