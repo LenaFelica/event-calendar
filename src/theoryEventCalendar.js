@@ -1,6 +1,8 @@
 //* Как обычно реакт и typescript
 //* npx create-react-app . template typescript
 
+import { createEvent } from "@testing-library/react";
+
 
 //* там подчищаем ненужные файлы
 
@@ -2313,3 +2315,236 @@ rules={[rules.required()]}
 //    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
 //    return `${year}.${month}.${day}`
 // }
+//*
+//* 
+//* функция formatDate готова, теперь можно возвращаться к DatePicker
+//
+//* идем в EventForm.tsx
+//* здеь еть строчка, котора выводит дату в консоль
+//* попробуем отформатировать е с помоью функции formatDate
+//* объек типа dayjs надо пеобразовать к объекту типа Date
+//* но поскольку date нам можнт вернуть и null,
+//* необходимо сделать проверку и уже в проверке делать преобразовани
+//
+//* вот так это выглядит в EventForm:
+// const selectDate = (date: dayjs.Dayjs | null) => {
+//    if(date) {
+//!       console.log(formatDate(date?.toDate()))
+//    }
+// }
+
+//* теперь остается эту отформатированную дату поместить в состояние
+//* консоль лог убираем
+//* вызываем setEvent({...event, date: formatDate(date.toDate())})
+
+//* а это выглядит теперь:
+// const selectDate = (date: dayjs.Dayjs | null) => {
+//    if(date) {
+//       // console.log(formatDate(date?.toDate()))
+//!       setEvent({...event, date: formatDate(date.toDate())})
+//    }
+// }
+
+
+//* Со всеми элементами формы разобралиьс
+//* Теперь необходимо обработать submit 
+//* слушатель называется onFinish={submitForm} - а функция, которая будет вызываться submitForm
+//* создадим функцию
+// const submitForm = () => {
+//      console.log(event) //* ока выведим сам ивент. чтобы убдиться, что там есть все поля
+// }
+
+//* поле author - пустое - сюда надо добавлять того пользователя, который на текущи момент залогинен!!!!
+//* 
+//* эту инфо мы можем получить из нашего сотояния \
+//* с помощью useTypedSelector(state => state.auth)
+//* и там мы храним самого пользователя
+//* const {user} = useTypedSelector(state => state.auth)
+
+//* и соответственно username этого пользователя
+//* при submite форы мы будем получать
+//* 
+//* вместо 
+// const submitForm = () => {
+//    console.log(event)
+//   }
+//* чтобы не изменять исходное состояние,
+//* будем создавать новый объект в него разворачивать ивент 
+//* и перезаписывать у него поле author
+//* а автора получаем из пользовател, которого достали из состояния
+//* console.log({...event, author: user.username})
+//
+
+// const submitForm = () => {
+//    console.log({...event, author: user.username})
+//   }
+//
+
+//* так как форма у нас переиспользуемая
+//* то определять логику сабмита мы будем на компонент выше!!!
+//* то есть, компонент который внутри сбя эту логику использует
+//* 
+//* в EventForm interface EventFormProps преелим этот пропс
+//* это будет обычная ф-я, которая ничего не возвращает, но аргументом принимает event:IEvent
+
+//* interface EventFormProps {
+//*    guests: IUser[],
+//*    submit: (event: IEvent) => void,
+//* }
+//
+//* то еть, таким образом, мы с помощью колбэка будем отдавать созданный ивент на уровень выше!!!
+//
+//* props.submit({...event, author: user.username})
+//
+// const submitForm = () => {
+//    props.submit({...event, author: user.username})
+//   }
+
+//* таким образом, логику у сабмита обрабатывает компонент, который внутри сбя использует нашшу форму
+//* получаетя , задача формы - отдать ивнт выше!!
+//*а что с ним делать - задача отдельного контейнера отдельного компонента
+
+//! event -> action-creators.ts
+//
+//* и сейчас как раз создадим еще один экшн-креаторс
+//* с помощью которого будемм добавлять созданный ивент в глобальное хранилище
+//* во-первых, обернем все в try/catch чтобы обработать потенциальную ошибку
+//* и в try сделаем некторую имитацию по работе ссервером
+//* 
+//* так как ивенты мы будем хранить в локалстрадже
+//* получим их оттуда, если ам ничего не будет, о будем получать пустой массив
+//? const events = localStorage.getItem("events") || '[]'
+//
+//* так как в локалсторадж мы храним данные как строку
+//* то нам надо преобразовать events  javascript объектом
+//? const json = JSON.parse(events);
+//
+//* после чего в полученный массив необходимо добавить новый созданный event
+//* json в нашем случае  - это массив
+//* но typescript не подхватыввает , что это массив
+//* поэтому необходимо это явно указать!!!!!
+//* указываем, что это массив ТИПА event !! as IEvent[]
+//? const json = JSON.parse(events) as IEvent[]
+//
+//* теперь в этот массив добавляем новый созданны   event
+//? json.push(event)
+//
+//* после чего этот массив надо поместить в состояние (а это dispatch), 
+//* чтобы мы увидели обновление интерфейса и увидели новое созданное событие
+//* вызываем экшн креаторс setEvents и туда передаем этот json
+//? dispatch(EventActionCreators.setEvents(json))
+//
+//* посе чего новый ивент надо снова поместить в локалсторадж
+//* чтобы после оновления страницы вся эа инфо не пропала:
+//* при этом запарсить его к строке - JSON.stringify
+//? localStorage.setItem('events', JSON.stringify(json))
+//
+//* это все имитация работы сервера!!!
+
+//* Теперь необходимо передать колбэк в Event.tsx -> EventForm
+//* и там как раз будем вызывать экшн креатор - createEvent
+//* выше здесь с помощью useActions() мы его получаем
+//? const {fetchGuests, createEvent} = useActions()
+//* и в 
+//?  <EventForm 
+//?   guests={guests}
+//?   submit={event => createEvent(event)} />
+
+//*
+//* теперь, чтобы убедиться, тчо состояние  у а оновляется
+//* и туда добавляется нов  элемент
+//* надо получить зесь же в Event.tsx events с помощью useTypedSeletor()
+//? const {guests, events} = useypedSelector(stae => state.event)
+//* выведем их в шаблон, предварительно преоразовав к строке:
+// return (
+//    <Layout>
+//        {JSON.stringify(events)}
+//        <EventCalendar events={[]} />
+//        <Row justify="center">
+//           <Button onClick={() => setModalVisible(true)}>Add event</Button>
+//        </Row>
+
+
+
+
+
+
+
+
+
+
+
+
+//! Event.tsx
+//* visible поменялся теперь на open !!! в документации
+//
+// import { Button, Layout, Modal, Row } from "antd";
+// import React, { FC, useEffect, useState } from "react";
+// import EventCalendar from "../components/EventCalendar";
+// import EventForm from "../components/EventForm";
+// import { useActions } from "../hooks/useActions";
+// import { useTypedSelector } from "../hooks/useTypedSelector";
+
+// const Event: FC = () => {
+
+//    const [modalVisible, setModalVisible] = useState(false)
+
+//    const {fetchGuests} = useActions();
+
+//    const { guests } = useTypedSelector(state => state.event)
+
+//    useEffect(() => {
+//       fetchGuests();
+//    }, [])
+
+
+//    return (
+//      <Layout>
+//          <EventCalendar events={[]} />
+//          <Row justify="center">
+//             <Button onClick={() => setModalVisible(true)}>Add event</Button>
+//          </Row>
+//          <Modal 
+//                title="Add event" 
+//!                open={modalVisible}
+//                footer={null}
+//                onCancel={() => setModalVisible(false)}               
+//                >
+//                <EventForm 
+//                   guests={guests}
+//                />
+//          </Modal>
+//      </Layout>
+//    )
+// }
+
+// export default Event;
+
+
+//! уще по ошибкам:
+// Если кто-то встретит ошибку "Argument of type '(dispatch: AppDispatch) => Promise<void>' is not assignable to parameter of type 'AnyAction'", то знайте, что dispatch в LoginForm нужно типизировать:
+//  const dispatch: Dispatch<any> = useDispatch()
+
+//!-------   изменения   -------
+// По поводу валидации даты 1:30:05 - при использовании Days.js (который на данный момент используется в Ant Design вместо Moment) у меня почему-то не работали методы value.isSame(currentDay) и value.isAfter(currentDay) -  всегда возвращали false,  поэтому я просто сравнивал текущую дату и дату ивента, мой код:
+
+// validator(_: any, value: Dayjs) {
+
+//             const currentDay = dayjs().date()
+//             if (value.date() >= currentDay) {
+//                 return Promise.resolve()
+//             }
+//             return Promise.reject(new Error(message))
+//         }
+
+//*----------------------------------
+//* Хороший способ. Но если Вы выберете предыдущий месяц или год, функция не выкинет ошибку. Я сделал так:
+//  isDateAfter: (message: string) => () => ({
+//     validator(_: any, value: Dayjs) {
+//       if (dayjs(value) >= dayjs()) {
+//         return Promise.resolve();
+//       }
+//       return Promise.reject(new Error(message));
+//     },
+//   }),
+

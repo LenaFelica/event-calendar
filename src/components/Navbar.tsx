@@ -34,7 +34,8 @@ const { logout } = useActions();
                      key={1}>
                      Exit
               </Menu.Item>
-              </Menu>     
+              </Menu>      
+
               </>
               :
               <Menu theme="dark" mode="horizontal" selectable={false}>

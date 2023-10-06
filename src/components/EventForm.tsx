@@ -1,13 +1,15 @@
 import { Button, DatePicker, Form, Input, Row, Select } from 'antd';
-import { Option } from 'antd/es/mentions';
 import dayjs from 'dayjs';
 import React, { FC, useState } from 'react';
+import { useTypedSelector } from '../hooks/useTypedSelector';
 import { IEvent } from '../models/IEvent';
 import { IUser } from '../models/IUser';
+import { formatDate } from '../utils/date';
 import { rules } from '../utils/rules';
 
 interface EventFormProps {
-   guests: IUser[]
+   guests: IUser[],
+   submit: (event: IEvent) => void,
 }
 
 const EventForm: FC<EventFormProps> = (props) => {
@@ -19,12 +21,21 @@ const EventForm: FC<EventFormProps> = (props) => {
       guest: '',
   } as IEvent); 
 
-   const selectDate = (date: dayjs.Dayjs | null) => {
-   console.log(date)
+  const {user} = useTypedSelector(state => state.auth)
+
+  const selectDate = (date: dayjs.Dayjs | null) => {
+      if(date) {
+         // console.log(formatDate(date?.toDate()))
+         setEvent({...event, date: formatDate(date.toDate())})
+      }
+  }
+
+  const submitForm = () => {
+   props.submit({...event, author: user.username})
   }
 
   return (
-    <Form>
+    <Form onFinish={submitForm}>
       <Form.Item
          label="Text event"
          name="description"

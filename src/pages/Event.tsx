@@ -9,9 +9,9 @@ const Event: FC = () => {
 
    const [modalVisible, setModalVisible] = useState(false)
 
-   const {fetchGuests} = useActions();
+   const {fetchGuests, createEvent} = useActions();
 
-   const { guests } = useTypedSelector(state => state.event)
+   const { guests, events } = useTypedSelector(state => state.event)
 
    useEffect(() => {
       fetchGuests();
@@ -20,18 +20,20 @@ const Event: FC = () => {
 
    return (
      <Layout>
+         {JSON.stringify(events)}
          <EventCalendar events={[]} />
          <Row justify="center">
             <Button onClick={() => setModalVisible(true)}>Add event</Button>
          </Row>
          <Modal 
                title="Add event" 
-               visible={modalVisible}
+               open={modalVisible}
                footer={null}
                onCancel={() => setModalVisible(false)}               
                >
                <EventForm 
                   guests={guests}
+                  submit={event => createEvent(event)}
                />
          </Modal>
      </Layout>
