@@ -1,5 +1,6 @@
 import { Button, DatePicker, Form, Input, Row, Select } from 'antd';
 import { Option } from 'antd/es/mentions';
+import dayjs from 'dayjs';
 import React, { FC, useState } from 'react';
 import { IEvent } from '../models/IEvent';
 import { IUser } from '../models/IUser';
@@ -10,12 +11,18 @@ interface EventFormProps {
 }
 
 const EventForm: FC<EventFormProps> = (props) => {
+
   const [event, setEvent] = useState<IEvent>({
       author: '',
       date: '',
       description: '',
       guest: '',
   } as IEvent); 
+
+   const selectDate = (date: dayjs.Dayjs | null) => {
+   console.log(date)
+  }
+
   return (
     <Form>
       <Form.Item
@@ -24,6 +31,8 @@ const EventForm: FC<EventFormProps> = (props) => {
          rules={[rules.required()]}
       >
          <Input
+            value={event.description}
+            onChange={e => setEvent({...event, description: e.target.value})}
          />
       </Form.Item>
 
@@ -32,7 +41,10 @@ const EventForm: FC<EventFormProps> = (props) => {
          name="guest"
          rules={[rules.required()]}
       >
-         <DatePicker />
+         <DatePicker 
+             onChange={(date) => selectDate(date) }
+
+         />
       </Form.Item>
       
       {/* <Form.Item>

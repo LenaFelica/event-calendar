@@ -2137,3 +2137,179 @@ type={"password"} //* чтобы скрыь символы
 //    guest: '',
 // } as IEvent); 
 //* <Select onChange={}
+
+
+//! EventForm -> Form.Item для Select (выпадающего списка):
+//* Делаем селект управляемым
+
+{/* <Form.Item
+label="User event"
+name="date"
+rules={[rules.required()]}>
+<Select 
+//! onChange={(guest: string) => setEvent({...event, guest})}
+
+>
+{props.guests.map(guest => 
+<Select.Option value={guest.username} key={guest.username}>
+    {guest.username}
+</Select.Option>
+)}
+</Select>
+</Form.Item> */}
+
+//! Делаем управляемым описание события:
+
+{/* <Form.Item
+label="Text event"
+name="description"
+rules={[rules.required()]}
+>
+<Input
+//!   value={event.description} - 
+//!   onChange={e => setEvent({...event, description: e.target.value})} //разворачиваем вс собятие и меняем пол дескриптшн у нащего сотояния
+/>
+</Form.Item> */}
+
+//! Делаем управляемым DatePicker ****
+//* DаtePicker в качестве value возвращает объект нам типа dayjs вместо по старому(и у ульби) moment
+//----------------------------------------------------------------------------
+//* Day.js
+// Быстрая альтернатива 2 КБ Moment.js с тем же современным API
+// НАЧАЛО РАБОТЫ
+//* Почему Day.js?
+// 2 Кб
+// Меньше JavaScript для загрузки, анализа и выполнения, что оставляет больше времени для вашего кода.
+//* Простой
+// Day.js это минималистичная библиотека JavaScript, которая анализирует, проверяет, манипулирует и отображает даты и время для современных браузеров с помощью в основном Moment.js-совместимого API.
+// Если вы используете Moment.js, вы уже знаете, как использовать Day.js.
+//* Неизменяемый
+// Все операции API, которые изменяют Day.js вместо объекта будет возвращен новый экземпляр.
+// Это помогает предотвратить ошибки и избежать длительных сеансов отладки.
+//----------------------------------------------------------------------------
+
+//* v -> dayjs.Dayjs | null | undefined
+//* это а самая библиотека, которую внутри себя исползует ant Design
+//* она подгрузилась в  package.json
+
+//* Value пока передавать не будем
+//* реализуем onChange:
+//
+//* onChange={(date) => selectDate(date)}
+//
+//* Будем вызывать функцию selectDate
+//* создадим ее выше сразу!!!
+//* это будет обычная стрелочная функция
+//* параметром она принимает date: dayjs , а также null !!!
+// const selectDate = (date: dayjs.Dayjs | null) {}
+
+
+//! EventForm
+
+// import { Button, DatePicker, Form, Input, Row, Select } from 'antd';
+// import { Option } from 'antd/es/mentions';
+// import dayjs from 'dayjs';
+// import React, { FC, useState } from 'react';
+// import { IEvent } from '../models/IEvent';
+// import { IUser } from '../models/IUser';
+// import { rules } from '../utils/rules';
+
+// interface EventFormProps {
+//    guests: IUser[]
+// }
+
+// const EventForm: FC<EventFormProps> = (props) => {
+
+//   const [event, setEvent] = useState<IEvent>({
+//       author: '',
+//       date: '',
+//       description: '',
+//       guest: '',
+//   } as IEvent); 
+
+//    const selectDate = (date: dayjs.Dayjs | null) => {
+//    console.log(date)
+//   }
+
+//   return (
+//     <Form>
+//       <Form.Item
+//          label="Text event"
+//          name="description"
+//          rules={[rules.required()]}
+//       >
+//          <Input
+//             value={event.description}
+//             onChange={e => setEvent({...event, description: e.target.value})}
+//          />
+//       </Form.Item>
+
+//       <Form.Item
+//          label="Date event"
+//          name="guest"
+//          rules={[rules.required()]}
+//       >
+//          <DatePicker 
+//              onChange={(date) => selectDate(date) }
+
+//          />
+//       </Form.Item>
+      
+//       {/* <Form.Item>
+//          <Select
+//          options={[
+//             { value: 'jack', label: 'Jack' },
+//             { value: 'lucy', label: 'Lucy' },
+//             { value: 'Yiminghe', label: 'yiminghe' },
+//             { value: 'disabled', label: 'Disabled', disabled: true },
+//          ]}
+//          />
+//       </Form.Item> */}
+
+//       <Form.Item
+//                label="User event"
+//                name="date"
+//                rules={[rules.required()]}>
+//          <Select 
+//             onChange={(guest: string) => setEvent({...event, guest})}
+        
+//          >
+//             {props.guests.map(guest => 
+//                <Select.Option value={guest.username} key={guest.username}>
+//                    {guest.username}
+//                </Select.Option>
+//             )}
+//          </Select>
+//       </Form.Item>
+      
+//       <Row justify="end">
+//       <Form.Item>
+//          <Button type="primary" htmlType="submit">
+//              Submit
+//          </Button>
+//       </Form.Item>
+//       </Row>
+
+//     </Form>
+//   )
+// }
+
+// export default EventForm;
+
+//! далее про форматирование utils -> date.ts
+//
+//* дату в объекте  храню как обычную строку, 
+//* чтобы форматировать ее как хочу и отправлять на бэенд в формате строки
+//* для этого , в utils создаем файл date.ts
+//
+//* там создаем , которая будт делать такое нужное форматирование!!!!
+//* функция будет возвращать строку - отформатированную строку!!!
+//* чтобы функция не зависила от билиотеки dayjs, можо принимать Date
+//* а dayjs приобразовывать уже к тому типу
+//
+//* export const formatDate = (date: Date): string => {
+//    const year = date.getFullYear();
+//    const month = date.getMonth() < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1
+//    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+//    return `${year}.${month}.${day}`
+// }
