@@ -2451,8 +2451,8 @@ rules={[rules.required()]}
 //?   submit={event => createEvent(event)} />
 
 //*
-//* теперь, чтобы убедиться, тчо состояние  у а оновляется
-//* и туда добавляется нов  элемент
+//* теперь, чтобы убедиться, тчо состояние  у а обновляется
+//* и туда добавляется новый  элемент
 //* надо получить зесь же в Event.tsx events с помощью useTypedSeletor()
 //? const {guests, events} = useypedSelector(stae => state.event)
 //* выведем их в шаблон, предварительно преоразовав к строке:
@@ -2464,6 +2464,150 @@ rules={[rules.required()]}
 //           <Button onClick={() => setModalVisible(true)}>Add event</Button>
 //        </Row>
 
+//! Event.tsx сейчас:
+// import { Button, Layout, Modal, Row } from "antd";
+// import React, { FC, useEffect, useState } from "react";
+// import EventCalendar from "../components/EventCalendar";
+// import EventForm from "../components/EventForm";
+// import { useActions } from "../hooks/useActions";
+// import { useTypedSelector } from "../hooks/useTypedSelector";
+
+// const Event: FC = () => {
+
+//    const [modalVisible, setModalVisible] = useState(false)
+
+//    const {fetchGuests, createEvent} = useActions();
+
+//    const { guests, events } = useTypedSelector(state => state.event)
+
+//    useEffect(() => {
+//       fetchGuests();
+//    }, [])
+
+
+//    return (
+//      <Layout>
+//          {JSON.stringify(events)}
+//          <EventCalendar events={[]} />
+//          <Row justify="center">
+//             <Button onClick={() => setModalVisible(true)}>Add event</Button>
+//          </Row>
+//          <Modal 
+//                title="Add event" 
+//                open={modalVisible}
+//                footer={null}
+//                onCancel={() => setModalVisible(false)}               
+//                >
+//                <EventForm 
+//                   guests={guests}
+//                   submit={event => createEvent(event)}
+//                />
+//          </Modal>
+//      </Layout>
+//    )
+// }
+
+// export default Event;
+//
+//-----------------------------------------------------------------
+//
+//* пока что мы только создаем событи и у нас нет 1й загрузки из локалсторадж
+//! Скрыть модальное окно и сделать первичную загрзку уже имеющихся events
+//* после оздания события закрое модалку
+//* действия:
+//* 1 - скрыть модалку
+//* 2 - создать событие
+//
+//* в Events.tsx
+//* создадим функцию:
+//* addNewEvent = (event: IEvent) => {
+//*   setModalVisible(false)   // скроем модалку
+//*   createEvent(event)       // создадим событие (при этом в EventForm -> submit={addNewEvent} - передаем сюда уже озданный колбэк
+//* }
+//
+//* в таком случае, после создания ивента, у нас будет закрыватьс модалка
+
+
+//* теперь:
+//*   {JSON.stringify(events)} - из шаблона удаляем
+//
+//* мы должны получать первичную одгрузку обытия
+//* пользователей мы получаем уже: (fetchGuests from action-creators)
+
+//? useEffect(() => {
+//?    fetchGuests(); 
+//? }, [])
+
+
+//! fetchEvents:
+//* ПОЛУЧАЕМ СОБЫТИЯ!!!
+//*  в events -> action-creators/ts создадим еще один экшн креаторс!!
+//*  fetchEvents:
+//* fetchEvents: (username: string) - получаем имя пользователя, который авторизован в данный момент!!!
+//* по хорошему, при получении каких-либо данных , обрабатывать также идекацию загрузки
+//* до получения данных перед началом запроса - isLoading (true)
+//* после получения и добавления локалторадж - isLoading(false)
+//* такж похорошем орабатывать ошибки а не просто выводить их в логе
+//* а рисовать в каком-нибудь алерте или форме
+//
+//* итак, в этом акшен креаторе нам также адо получить данные из локалстораджа
+//* распарсить их и поместить в состояни
+//* но в локалсторадже мы храним все данные
+//* а нам необходимо получать данны для конкретного пользователя
+//?     const currentUserEvents 
+//* либо он гость, либо он автор того или иного события
+//* фильтруем ммассив json и делаем две роверки
+//* проверяем, явл ли пользователь username авором либо гостем
+//?     const currentUserEvents = json.filter(ev => ev.author === username || ev.guest === username)
+//* и отавляем только те события, которые удовлтворяют этому уссловию
+//* после того, как массив отфильтровали, остается задипачить соответствующий экшн креатор
+//* и туда передать отфильтрованный массив
+//?     dispatch(EventActionCreators.setEvents(currentUserEvents))
+
+//
+//* fetchEvents: (username: string) => async(dispatch: ApDispatch) => {
+//    try {
+//       const events = localStorage.getItem("events") || '[]'
+//       const json = JSON.parse(events) as IEvent[];
+//       const currentUserEvents = json.filter(ev => ev.author === username || ev.guest === username)
+//?     dispatch(EventActionCreators.setEvents(currentUserEvents))
+//    } catch(e) {
+//       console.log(e)
+//    }
+// }
+
+//* теперь идем обратно к компоненту Events.tx
+//* useEffect()
+//* и там где вызывали fetchGuests
+//* там вызывае теперь fetchEvents
+
+//* получаем fetchEvents в хуке useActions()
+//* и добавляем внутрь колбэка в юзэфект
+//
+// useEffect(() => {
+//    fetchGuests()
+//    fetchEvents()  //* и сюда нам необходимо передать имя пользователя!!!
+// }, [])
+
+//* получить его можно из состояния выше 
+//* ээто будет сотоние, которое мы забираем из редьюсера auth
+//
+//? const {user} = useTypedSelector(state => state.auth)
+//? 
+
+// useEffect(() => {
+//    fetchGuests()
+//    fetchEvents(user.username)  
+// }, [])
+
+
+//* теперь выведем эти ивенты в шаблон и убедимся,
+//*  что при вервичной загрузке они подгружаются
+//* предварительно переведем в троку:
+//
+//? <Lyaout>
+//?   <div>{JSON.stringify(events)}</div>
+//?</Lyaout>
 
 
 
